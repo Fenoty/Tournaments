@@ -1,0 +1,31 @@
+@import '_variables.scss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-weight: normal;
+  text-decoration: none;
+  -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
+
+  font-family: $fontPrimary;
+  background: none;
+  list-style-type: none;
+  border: none;
+}
+
+html, body, #__nuxt{
+    height: 100%;
+}
+
+.container{
+    padding: 0 20px;
+    width: 100%;
+    max-width: 100%;
+    margin: 0 auto;
+}
