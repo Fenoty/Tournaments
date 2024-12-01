@@ -1,38 +1,58 @@
 {
-  "name": "nuxt-app",
+  "name": "tournaments",
+  "version": "0.0.1",
   "private": true,
   "type": "module",
+  "imports": {
+    "@*": [
+      "./src/*",
+      "./src/*.ts",
+      "./src/*.tsx",
+      "./src/*.js",
+      "./src/*.jsx",
+      "./src/*/index.ts",
+      "./src/*/index.tsx",
+      "./src/*/index.js",
+      "./src/*/index.jsx"
+    ]
+  },
   "scripts": {
-    "build": "nuxt build",
-    "dev": "nuxt dev",
-    "generate": "nuxt generate",
-    "preview": "nuxt preview",
-    "postinstall": "nuxt prepare"
+    "dev": "vite --host --mode dev",
+    "serve-dev": "vite build --watch --mode dev",
+    "dev-prod": "vite --host --mode prod",
+    "serve-prod": "vite build --watch --mode prod",
+    "build": "run-p type-check \"build-only {@}\" --mode prod",
+    "preview": "vite preview",
+    "build-only": "vite build --mode prod",
+    "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
-    "@nuxt/icon": "^1.5.1",
-    "@nuxt/image": "^1.8.0",
-    "@nuxtjs/axios": "^5.13.6",
-    "@pinia/nuxt": "^0.8.0",
-    "axios": "^1.7.8",
-    "class-variance-authority": "^0.7.0",
-    "clsx": "^2.1.1",
+    "axios": "^1.7.2",
     "lodash": "^4.17.21",
-    "lucide-vue-next": "^0.445.0",
-    "nuxt": "^3.13.0",
-    "pinia": "^2.2.8",
-    "radix-vue": "^1.9.6",
-    "tailwind-merge": "^2.5.2",
-    "tailwindcss-animate": "^1.0.7",
-    "vue": "latest",
-    "vue-router": "latest"
+    "pinia": "^2.1.7",
+    "vue": "^3.4.21",
+    "vue-axios": "^3.5.2",
+    "vue-router": "^4.3.0",
+    "vue-skeletor": "^1.0.6",
+    "vue3-loading-skeleton": "^0.0.13"
   },
   "devDependencies": {
-    "@nuxtjs/tailwindcss": "^6.12.2",
-    "sass": "^1.79.3",
-    "tailwindcss": "^3.4.15"
-  },
-  "overrides": {
-    "vue": "latest"
+    "@tsconfig/node20": "^20.1.4",
+    "@types/lodash": "^4.17.7",
+    "@types/node": "^20.16.11",
+    "@vitejs/plugin-vue": "^5.1.4",
+    "@vitejs/plugin-vue-jsx": "^3.1.0",
+    "@vue/tsconfig": "^0.5.1",
+    "npm-run-all2": "^6.1.2",
+    "sass": "^1.77.4",
+    "sharp": "^0.33.5",
+    "svgo": "^3.3.2",
+    "telegram-webapps": "^7.7.0",
+    "typescript": "~5.4.0",
+    "vite": "^5.2.8",
+    "vite-plugin-image-optimizer": "^1.1.8",
+    "vite-plugin-vue-devtools": "^7.0.25",
+    "vite-tsconfig-paths": "^4.3.2",
+    "vue-tsc": "^2.0.11"
   }
 }

@@ -1,75 +1,44 @@
-# Nuxt 3 Minimal Starter
+# TAP ARENA
 
-Look at the [Nuxt 3 documentation](https://nuxt.com/docs/getting-started/introduction) to learn more.
+## Версии 
+`node => 20.14.0`
+`npm => 10.7.0`
 
-## Setup
+## Порядок запуска `dev` версии
 
-Make sure to install the dependencies:
-
-```bash
-# npm
+### Инициализация пакетов
+```sh
 npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
-bun install
 ```
 
-## Development Server
-
-Start the development server on `http://localhost:3000`:
-
-```bash
-# npm
+### Открытие приложение на локальном сервере
+```sh
 npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
-bun run dev
 ```
 
-## Production
-
-Build the application for production:
-
-```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
-bun run build
+### Создание автообновляемого билда при `dev` значениях
+```sh
+npm run serve-dev
 ```
 
-Locally preview production build:
+## Порядок запуска `prod` версии
 
-```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
-bun run preview
+### Инициализация пакетов
+```sh
+npm install
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+### Создание билда без автообновления
+```sh
+npm run build-only
+```
+
+## Полезные ссылки
+
+### Тестовые 
+[Telegram Web App](https://t.me/PAC_TapArena_bot)
+
+[Сайт](https://service-front.fenoty.ru)
+
+### Продакшн
+[Telegram Web App](https://t.me/tap_arena_bot)
