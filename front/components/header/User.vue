@@ -31,7 +31,7 @@ header {
     top: 0;
     left: 0;
     .header{
-        padding: 20px;
+        padding: 20px 0;
 
         display: flex;
         flex-direction: row;

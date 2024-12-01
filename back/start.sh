@@ -1,0 +1,1 @@
+gunicorn --reload -w 4 -b 0.0.0.0:8081 main:app
