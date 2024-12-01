@@ -12,6 +12,9 @@
 </template>
 
 <script setup lang="ts">
+import {tourStore} from '@stores/tours.ts'
+
+
 const searchTour = (value: any) => {
     console.log('callback', value);
     

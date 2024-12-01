@@ -8,13 +8,34 @@ export default defineNuxtConfig({
         enabled: true,
 
         timeline: {
-            enabled: true,
+            enabled: false,
         },
     },
-    modules: ["@nuxtjs/tailwindcss", "@nuxt/icon", "@nuxt/image"],
+    plugins: [
+        "~/plugins/pinia.js", 
+    ],
+    modules: [
+        "@nuxtjs/axios", 
+        "@nuxtjs/tailwindcss", 
+        "@nuxt/icon", 
+        "@nuxt/image", 
+        "@pinia/nuxt"
+    ],
     alias: {
-        '@images': fileURLToPath(new URL('./assets/images', import.meta.url))
+        '@images': fileURLToPath(new URL('./assets/images', import.meta.url)),
+        '@stores': fileURLToPath(new URL('./stores', import.meta.url)),
     },
+    // lodash: {
+    //     prefix: "_",
+    //     prefixSkip: ["string"],
+    //     upperAfterPrefix: false,
+    //     exclude: ["map"],
+    //     alias: [
+    //         ["camelCase", "stringToCamelCase"], // => stringToCamelCase
+    //         ["kebabCase", "stringToKebab"], // => stringToKebab
+    //         ["isDate", "isLodashDate"], // => _isLodashDate
+    //     ],
+    // },
     vite: {
         css: {
             preprocessorOptions: {

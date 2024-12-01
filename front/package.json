@@ -12,10 +12,15 @@
   "dependencies": {
     "@nuxt/icon": "^1.5.1",
     "@nuxt/image": "^1.8.0",
+    "@nuxtjs/axios": "^5.13.6",
+    "@pinia/nuxt": "^0.8.0",
+    "axios": "^1.7.8",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.1",
+    "lodash": "^4.17.21",
     "lucide-vue-next": "^0.445.0",
     "nuxt": "^3.13.0",
+    "pinia": "^2.2.8",
     "radix-vue": "^1.9.6",
     "tailwind-merge": "^2.5.2",
     "tailwindcss-animate": "^1.0.7",
@@ -26,5 +31,8 @@
     "@nuxtjs/tailwindcss": "^6.12.2",
     "sass": "^1.79.3",
     "tailwindcss": "^3.4.15"
+  },
+  "overrides": {
+    "vue": "latest"
   }
 }
