@@ -9,19 +9,27 @@
                         <li><RouterLink to="/contacts">Контакты</RouterLink></li>
                     </ul>
                 </nav>
+                <template v-if="isLoggedIn">
+                    <Button @click.prevent="logout" class="max-w-fit text-[20px] p-[10px]">Выйти</Button>
+                </template>
             </div>
         </div>
     </header>
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-const route = useRoute();
+import { adminStore } from '@/stores/admin';
+import Button from '@components/button/Default.vue'
 
+import { computed } from 'vue';
 
-const isActive = (path: any) => {
-  return route.path === path || route.path.startsWith(path + '/');
-};
+const adminStorage = adminStore()
+const isLoggedIn = computed(() => adminStorage.isLoggedIn)
+const logout = () => {
+    adminStorage.logout()
+
+}
+
 </script>
 
 <style lang="scss" scoped>
@@ -47,6 +55,7 @@ header {
             font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
         }
         nav{
+            flex-grow: 1;
             ul{
                 display: flex;
                 flex-direction: row;

@@ -5,13 +5,13 @@
             <form class="login-form">
                 <label>
                     Логин
-                    <input placeholder="Логин" type="text" pl>
+                    <input v-model="username" placeholder="Логин" type="text">
                 </label>
                 <label>
                     Пароль
-                    <input placeholder="********" type="password" pl>
+                    <input v-model="password" placeholder="********" type="password">
                 </label>
-                <Button class="p-[16px] font-bold">Войти</Button>
+                <Button @click.prevent="submitForm" class="p-[16px] font-bold" :class="{'disabled': disabled}">Войти</Button>
             </form>
         </div>
     </div>
@@ -19,6 +19,34 @@
 
 <script lang="ts" setup>
 import Button from '@components/button/Default.vue'
+import { adminStore } from '@/stores/admin';
+import { ref, computed, onMounted, watch } from 'vue';
+
+import router from '@/router';
+
+const username = ref('')
+const password = ref('')
+const disabled = computed(() => {
+    return (username.value.length > 3 && password.value.length > 3) ? false : true
+})
+
+
+const adminStorage = adminStore()
+const isLoggedIn = computed(() => adminStorage.isLoggedIn)
+
+if (isLoggedIn.value) {
+    router.push({path: '/'})
+}
+
+const submitForm = async () => {
+    if (username.value.length > 3 && password.value.length > 3) {
+        if (await adminStorage.auth(username.value, password.value)) {
+            router.push({path: '/'})
+        } 
+    }
+}
+
+
 
 </script>
 
@@ -68,6 +96,10 @@ import Button from '@components/button/Default.vue'
         }
         button{
             font-size: 32px;
+            &.disabled{
+                cursor: auto;
+                background: gray;
+            }
         }
     }
 }

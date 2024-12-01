@@ -5,7 +5,7 @@ const router = createRouter({
     routes: [
         {
             path: "/",
-            name: 'Tour',
+            name: 'Tours',
             meta: {
                 requiresAuth: true,
                 hideForAuth: false,
@@ -22,7 +22,7 @@ const router = createRouter({
                 },
                 {
                     path: '/tour/:id',
-                    name: 'Tournament',
+                    name: 'Tour',
                     component: () => import("@views/tour/detail.vue"),
                     meta: {
                         requiresAuth: true,
@@ -32,6 +32,7 @@ const router = createRouter({
 
             ]
         },
+        
         {
             path: "/contacts",
             name: "Contacts",

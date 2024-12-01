@@ -1,5 +1,10 @@
 <template>
     <template v-if="type === 'Link' && link">
+        <a :href="link" class="btn" :to="link">
+            <slot/>
+        </a>
+    </template>
+    <template v-else-if="type === 'Router-Link' && link">
         <RouterLink  class="btn" :to="link">
             <slot/>
         </RouterLink>
@@ -14,7 +19,7 @@
 <script lang="ts" setup>
 defineProps({
     type: {
-        type: String as () => 'Btn' | 'Link',
+        type: String as () => 'Btn' | 'Link' | 'Router-Link',
         required: false,
         default: 'Btn'
     },

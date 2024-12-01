@@ -1,8 +1,8 @@
 <template>
     <Header/>
-    <main>
+    <main class="h-full">
         <RouterView v-slot="{Component}">
-            <transition name="fade-general" mode="out-in" appear>
+            <transition name="fade" mode="out-in" appear>
                 <KeepAlive>
                     <component :is="Component"></component>
                 </KeepAlive>
@@ -18,23 +18,29 @@
 import Header from '@components/header/Default.vue'
 import { RouterView } from 'vue-router';
 
+import { onMounted } from 'vue';
+import { adminStore } from '@stores/admin';
+
+const adminStorage = adminStore()
+adminStorage.checkAuth();
+
 </script>
 
 
 
 <style lang="scss">
 
-.fade-general-enter-active,
-.fade-general-leave-active {
+.fade-enter-active,
+.fade-leave-active {
     transition: all 0.3s ease;
 }
 
-.fade-general-enter-from,
-.fade-general-leave-to {
+.fade-enter-from,
+.fade-leave-to {
     opacity: 0;
 }
-.fade-general-enter-to,
-.fade-general-leave-from {
+.fade-enter-to,
+.fade-leave-from {
     opacity: 1;
 }
 </style>

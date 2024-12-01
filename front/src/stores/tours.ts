@@ -1,3 +1,4 @@
+import _ from 'lodash';
 import axios from 'axios';
 import { defineStore } from 'pinia';
 
@@ -6,7 +7,13 @@ export const tourStore = defineStore('TourStore', {
         data: 'sdasdasdsadsa',
         error: null,
         tournaments: null as any,
+        searchValue: '' as string
     }),
+    getters: {
+        getFilteredTours(): any{
+            return _.filter(this.tournaments, item => _.includes(_.toLower(item.name), _.toLower(this.searchValue)));
+        }
+    },
     actions: {
         async getAllTour() {
             return await axios({
@@ -23,12 +30,11 @@ export const tourStore = defineStore('TourStore', {
 
         },
         async getAllTourTeams(tourId: number) {
-            const id = Number(tourId)
             return await axios({
                 method: "get",
                 url: `${import.meta.env.VITE_API_URL}/getAllTourTeams`,
                 params: {
-                    id: id
+                    id: tourId
                 }
             })
             .then((response) => {  
@@ -40,12 +46,11 @@ export const tourStore = defineStore('TourStore', {
 
         },
         async getCurrentTour(tourId: number) {
-            const id = Number(tourId)
             if (!this.tournaments) {
                 await this.getAllTour();
             }
 
-            return await this.tournaments.filter((item: any) => item.id === Number(id))[0]
+            return await this.tournaments.filter((item: any) => item.id === tourId)[0]
         },
     },
 });

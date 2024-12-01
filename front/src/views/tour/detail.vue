@@ -1,6 +1,6 @@
 <template>
     <div class="container">
-        <div class="tournament">
+        <div class="tournament"> 
             <div class="tournament-top">
                 <div class="tournament-top-image">
                     <img :src="tourData.image" :alt="tourData.name">
@@ -11,42 +11,79 @@
                     
                 </div>
                 <div class="tournament-top-links">
-                    <Qrcode
+                    
+                    <QRCodeVue3
+                        :width="350"
+                        :height="350"
+                        myclass="qr"
                         :value="tourData.url"
-                        variant="rounded"
-                    />
-                    <ButtonDefault type="Link" :link="tourData.url" class="mx-auto max-w-[95%] p-[16px] text-[24px] font-bold">Записаться</ButtonDefault>
+                        :qrOptions="{ typeNumber: 0, mode: 'Byte',}"
+                        :dotsOptions="{
+                            type: 'square',
+                            color: 'black',
+                        }"
+                        :backgroundOptions="{ color: '#ffffff' }"
+                        :cornersSquareOptions="{ type: 'square', color: '#000000' }"
+                        :cornersDotOptions="{ type: 'square', color: '#000000' }"
+                        />
+                    <Button type="Link" :link="tourData.url" class="p-[16px] text-[24px] font-bold">Записаться</Button>
                 </div>
             </div>
-            <div class="tournament-teams">
-                <h2>Команды:</h2>
-                <ul>
-                    <li v-for="item in teamsData" :key="item.id">
-                        <h6>{{ item.team }}</h6>
-                        <p>Очков: {{ item.points }}</p>
-                    </li>
-                </ul>
-            </div>
+            <template v-if="teamsData.length > 0">
+                <div class="tournament-teams">
+                    <h2>Команды:</h2>
+                    <ul>
+                        <li v-for="item in teamsData" :key="item.id">
+                            <h6>{{ item.team }}</h6>
+                            <p>Очков: {{ item.points }}</p>
+                        </li>
+                    </ul>
+                </div>
+            </template>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { tourStore } from '@stores/tours.ts'
-const route = useRoute()
-const tourStorage = tourStore();
-console.log(route.params.id);
+import QRCodeVue3 from "qrcode-vue3";
+import Button from '@components/button/Default.vue'
+import { useRoute } from 'vue-router';
+import { tourStore } from '@stores/tours'
 
-const tourData = await tourStorage.getCurrentTour(route.params.id)
-const teamsData = await tourStorage.getAllTourTeams(route.params.id)
+import { onMounted, ref, watch } from 'vue';
+
+const route = useRoute()
+
+const tourStorage = tourStore();
+
+const tourData = ref({}) as any;
+const teamsData = ref({}) as any;
+
+const initData = async (route: any) => {
+    if (route.params.id) {
+        tourData.value = await tourStorage.getCurrentTour(Number(route.params.id))
+        teamsData.value = await tourStorage.getAllTourTeams(Number(route.params.id))
+    }
+}
+
+
+
+onMounted(async () => {
+    await initData(route);
+    
+    watch(route, async (newValue, oldValue) => {
+        await initData(newValue);
+    })
+})
+
 
 
 
 </script>
 
-<style lang="scss" scoped>
+<style lang="scss">
 .tournament{
-    margin-top: 60px;
+    padding: 60px 0;
 
     display: flex;
     flex-direction: column;
@@ -89,8 +126,8 @@ const teamsData = await tourStorage.getAllTourTeams(route.params.id)
             display: flex;
             flex-direction: column;
             gap: 16px;
-            svg{
-                $size: 370px;
+            .qr{
+                $size: 350px;
                 max-width: $size;
                 min-width: $size;
                 max-height: $size;
