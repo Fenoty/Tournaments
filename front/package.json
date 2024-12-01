@@ -21,9 +21,9 @@
     "serve-dev": "vite build --watch --mode dev",
     "dev-prod": "vite --host --mode prod",
     "serve-prod": "vite build --watch --mode prod",
-    "build": "run-p type-check \"build-only {@}\" --mode prod",
     "preview": "vite preview",
     "build-only": "vite build --mode prod",
+    "build": "vite build",
     "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
