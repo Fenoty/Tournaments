@@ -8,7 +8,10 @@
                 <div class="tournament-top-info">
                     <h1>{{tourData.name}}</h1>
                     <p>{{ tourData.description }}</p>
-                    
+                    <div class="date">
+                        <h6>Даты проведения:</h6>
+                        <p>{{tourData.date}}</p>
+                    </div>
                 </div>
                 <div class="tournament-top-links">
                     
@@ -31,15 +34,30 @@
                 </div>
             </div>
             <template v-if="teamsData.length > 0">
-                <div class="tournament-teams">
-                    <h2>Команды:</h2>
-                    <ul>
-                        <li v-for="item in teamsData" :key="item.id">
-                            <h6>{{ item.team }}</h6>
-                            <p>Очков: {{ item.points }}</p>
-                        </li>
-                    </ul>
+                <div class="tournament-content">
+                    <div class="tournament-content-tab">
+                        <button @click="[tabs.teams = true, tabs.grid = false]" :class="{'active': tabs.teams}">Команды</button>
+                        <button @click="[tabs.grid = true, tabs.teams = false]" :class="{'active': tabs.grid}">Турнирная сетка</button>
+                    </div>
+                    <div class="px-[16px] py-[32px]">
+                        <template v-if="tabs.teams">
+                            <div class="tournament-content-teams">
+                                <ul>
+                                    <li v-for="item in teamsData" :key="item.id">
+                                        <h6>{{ item.team }}</h6>
+                                        <p>Очков: {{ item.points }}</p>
+                                    </li>
+                                </ul>
+                            </div>
+                        </template>
+                        <template v-else-if="tabs.grid">
+                            <div class="tournament-content-grid">
+                                <Grid :grid="teamsGridData" :logged="isLoggedIn"/>
+                            </div>
+                        </template>
+                    </div>
                 </div>
+                
             </template>
         </div>
     </div>
@@ -51,23 +69,90 @@ import Button from '@components/button/Default.vue'
 import { useRoute } from 'vue-router';
 import { tourStore } from '@stores/tours'
 
-import { onMounted, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
+
+import Grid from "@/components/layout/Grid.vue";
+import _ from "lodash";
+import { adminStore } from "@/stores/admin";
 
 const route = useRoute()
 
+
+const adminStorage = adminStore()
 const tourStorage = tourStore();
+
+const isLoggedIn = computed(() => adminStorage.isLoggedIn)
 
 const tourData = ref({}) as any;
 const teamsData = ref({}) as any;
+const teamsGridData = ref([]) as any;
+
+const tabs = ref({
+    teams: false as boolean,
+    grid: true as boolean
+})
+
+
 
 const initData = async (route: any) => {
     if (route.params.id) {
         tourData.value = await tourStorage.getCurrentTour(Number(route.params.id))
-        teamsData.value = await tourStorage.getAllTourTeams(Number(route.params.id))
-    }
+
+        const teamsRawData = await tourStorage.getAllTourTeams(Number(route.params.id))
+        teamsData.value = _.filter(teamsRawData, {iteration: 0})
+        teamsGridData.value = generateGrid(teamsRawData)
+    }  
 }
 
 
+const generateGrid = (data: any) => {
+    const rounds = [] as any
+
+    for (let iteration = 0; iteration <= data[0].iteration; iteration++) {
+
+        let allPlayers = _.chunk(_.filter(data, {iteration: iteration}), 2)
+        console.log('allPlayers',allPlayers);
+        
+        let games = [] as any
+        allPlayers.forEach((chunk: any) => {
+            console.log('chunk', chunk);
+            
+            let game = {}
+            if (chunk.length == 2) {
+                game = {
+                    player1: {
+                        id: chunk[0].team.toString(),
+                        team_id: chunk[0].id.toString(),
+                        name: chunk[0].team,
+                        winner: chunk[0].win
+                    },
+                    player2: {
+                        id: chunk[1].team.toString(),
+                        team_id: chunk[1].id.toString(), // Пример, взять следующего игрока
+                        name: chunk[1].team,
+                        winner: chunk[1].win // Условие по вашему требованию
+                    }
+                };
+            }
+            else{
+                game = {
+                    player1: {
+                        id: chunk[0].team.toString(),
+                        team_id: chunk[0].id.toString(),
+                        name: chunk[0].team,
+                        winner: chunk[0].win
+                    },
+                };
+            }
+            games.push(game)
+        });
+        console.log('games', games);
+        rounds.push({games: games})
+        console.log('rounds', rounds);
+    }
+
+    return rounds
+}
 
 onMounted(async () => {
     await initData(route);
@@ -122,6 +207,17 @@ onMounted(async () => {
                 font-weight: 500;
                 font-size: 22px;
             }
+            .date{
+                margin-top: 16px;
+
+                display: flex;
+                flex-direction: column;
+                gap: 16px;
+                h6{
+                    font-size: 24px;
+                    font-weight: 600;
+                }
+            }
         }
         &-links{
             display: flex;
@@ -137,34 +233,56 @@ onMounted(async () => {
 
         }
     }
-    &-teams{
-        display: flex;
-        flex-direction: column;
-        gap: 32px;
-        h2{
-            font-size: 50px;
-            font-weight: 600;
-        }
-        ul{
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 10px;
-            li{
-                background: $color-5;
-                padding: 16px;
     
-                display: flex;
-                flex-direction: column;
-                gap: 10px;
-                h6{
-                    font-size: 24px;
-                    font-weight: 600;
-                }
-                p{
-                    font-size: 16px;
-                    font-weight: 500;
+    &-content{
+        background: $color-5;
+        &-tab{
+            font-size: 32px;
+            font-weight: 600;
+    
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 16px;
+
+            background: $white;
+            button{
+                padding: 16px;
+                &.active{
+                    background: $color-5;
                 }
             }
+        }
+        &-teams{
+            display: flex;
+            flex-direction: column;
+            gap: 32px;
+            
+            ul{
+                display: grid;
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+                gap: 10px;
+                li{
+                    background: $color-4;
+                    padding: 16px;
+        
+                    display: flex;
+                    flex-direction: column;
+                    gap: 10px;
+                    h6{
+                        font-size: 24px;
+                        font-weight: 600;
+                    }
+                    p{
+                        font-size: 16px;
+                        font-weight: 500;
+                    }
+                }
+            }
+        }
+        &-grid{
+            max-height: 700px;
+            overflow: scroll;
         }
     }
 }
