@@ -114,7 +114,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()\n    # Используем параметризированный запрос\n    cur.execute(\"SELECT * FROM tour_teams WHERE tour_id = %s ORDER BY id DESC\", (id,))\n    rows = cur.fetchall()\n    response = jsonify(serialize_result(cur, rows))\n    cur.close()\n    return response, 200\n# Получить все записи",
+        "peekOfCode": "def get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()\n    # Используем параметризированный запрос\n    cur.execute(\"SELECT * FROM tour_teams WHERE tour_id = %s ORDER BY iteration DESC\", (id,))\n    rows = cur.fetchall()\n    response = jsonify(serialize_result(cur, rows))\n    cur.close()\n    return response, 200\n# Получить все записи",
         "detail": "back.main",
         "documentation": {}
     },
