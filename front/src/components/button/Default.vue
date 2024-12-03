@@ -46,5 +46,11 @@ defineProps({
     &:hover{
         background: $color-3;
     }
+    &.dark{
+        background: $color-2;
+        &:hover{
+            background: $color-4;
+        }
+    }
 }
 </style>

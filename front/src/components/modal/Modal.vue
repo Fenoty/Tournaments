@@ -34,14 +34,20 @@ defineProps({
     height: 100%;
 
     background: rgba(0,0,0,0.5);
-
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
+    padding: 60px;
+    &.align-none{
+        align-items: normal;
+    }
     &-modal{
         position: relative;
+        overflow-y: scroll;
+        max-height: fit-content;
+        
+        
         background: $white;
-
         width: 100%;
         max-width: 800px;
         padding: 50px 32px 32px 32px;

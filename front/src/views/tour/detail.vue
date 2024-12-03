@@ -12,7 +12,8 @@
                 </div>
                 <div class="tournament-top-links">
                     
-                    <QRCodeVue3
+                    <QRCodeVue3 
+                        v-if="tourData.url"
                         :width="350"
                         :height="350"
                         myclass="qr"
@@ -25,7 +26,7 @@
                         :backgroundOptions="{ color: '#ffffff' }"
                         :cornersSquareOptions="{ type: 'square', color: '#000000' }"
                         :cornersDotOptions="{ type: 'square', color: '#000000' }"
-                        />
+                    />
                     <Button type="Link" :link="tourData.url" class="p-[16px] text-[24px] font-bold">Записаться</Button>
                 </div>
             </div>

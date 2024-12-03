@@ -1,6 +1,7 @@
 import _ from 'lodash';
 import axios from 'axios';
 import { defineStore } from 'pinia';
+import { promiseAlert } from '@/notification/answers';
 import { tourStore } from '@stores/tours';
 
 export const adminStore = defineStore('AdminStore', {
@@ -38,7 +39,8 @@ export const adminStore = defineStore('AdminStore', {
             this.isLoggedIn = logged && logged === "logged" ? true : false
         },
         async auth(username: string, password: string) {
-            return await axios({
+
+            const promise = axios({
                 method: "post",
                 url: `${import.meta.env.VITE_API_URL}/auth`,
                 data: {
@@ -46,8 +48,14 @@ export const adminStore = defineStore('AdminStore', {
                     password: password
                 }
             })
-            .then((response) => {                    
-                if (response.data.status) {
+
+            return await promiseAlert(promise,
+                'Авторизация...',
+                'Успешная авторизация',
+                'Произошла ошибка',
+            )
+            .then(async (response) => {      
+                if (response.status) {
                     this.setCookie(username, 'logged', 7)
                     this.isLoggedIn = true
 
@@ -61,9 +69,8 @@ export const adminStore = defineStore('AdminStore', {
 
         // Edit tours
         async saveEditTour(data: any) {
-            console.log(data);
-            
-            return await axios({
+
+            const promise = axios({
                 method: "post",
                 url: `${import.meta.env.VITE_API_URL}/saveEditTour`,
                 data: {
@@ -74,35 +81,46 @@ export const adminStore = defineStore('AdminStore', {
                     description: data.description,
                 }
             })
+
+            return await promiseAlert(promise,
+                'Турнир удаляется...',
+                'Турнир удален',
+                'Произошла ошибка',
+            )
             .then(async (response) => {      
                 const tourStorage = tourStore()  
 
-                await response.data.map((item: any) => {
+                await response.map((item: any) => {
                     item.image = import.meta.env.VITE_STORAGE + item.image
                 })            
                 
-                tourStorage.tournaments = response.data
+                tourStorage.tournaments = response
                 
             })
             .catch((error) => console.log(error));
         },
         async deleteTour(tourId: number) {
-            return await axios({
+            const promise = axios({
                 method: "post",
                 url: `${import.meta.env.VITE_API_URL}/deleteTour`,
                 data: {
                     id: tourId,
                 }
             })
+
+            return await promiseAlert(promise,
+                'Турнир удаляется...',
+                'Турнир удален',
+                'Произошла ошибка',
+            )
             .then(async () => {      
                 const tourStorage = tourStore()  
-                _.remove(tourStorage.tournaments, {id: tourId})                
+                _.remove(tourStorage.tournaments, {id: tourId})      
             })
             .catch((error) => console.log(error));
+
         },
         async createTour(data: any) {
-            console.log(data);
-
             let formData = new FormData();
             formData.append('name', data.name); 
             formData.append('date', data.date); 
@@ -111,22 +129,43 @@ export const adminStore = defineStore('AdminStore', {
             formData.append('url', data.url); 
             formData.append('price_place', data.price_place); 
             formData.append('grid_type', data.grid_type); 
-           
-            console.log(...formData.entries());
-            
-            return await axios({
-                method: "post",
-                url: `${import.meta.env.VITE_API_URL}/createTour`,
-                headers: {
-                    'Content-Type': 'multipart/form-data' // Указываем, что это форма
-                },
-                data: formData
-            })
-            .then(async (response) => {      
-                console.log(response);
-                              
-            })
-            .catch((error) => console.log(error));
+
+
+            if (data.teams) {
+                formData.append('teams', data.teams); 
+                formData.append('random', data.random); 
+            }
+
+            try {
+                const promise = axios({
+                    method: "post",
+                    url: `${import.meta.env.VITE_API_URL}/createTour`,
+                    headers: {
+                        'Content-Type': 'multipart/form-data' // Указываем, что это форма
+                    },
+                    data: formData
+                })
+
+                return await promiseAlert(promise,
+                    'Турнир создается...',
+                    'Турнир создан',
+                    'Произошла ошибка',
+                )
+                .then(async (response) => {      
+                    console.log(response);
+                    const tourStorage = tourStore() 
+                
+                    await response.map((item: any) => {
+                        item.image = import.meta.env.VITE_STORAGE + item.image
+                        tourStorage.tournaments.unshift(item)
+                    })        
+                })
+                .catch((error) => console.log(error));
+
+            } catch (error) {
+                console.log(error);
+                
+            }
         },
     },
 });

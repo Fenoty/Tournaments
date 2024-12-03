@@ -69,7 +69,7 @@
         "kind": 6,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "class MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\nprint(crypt.encrypt('MeowMeowMeow')) # Encrypt\nprint(crypt.decrypt(\"gAAAAABnS_f3cGMHcmH1KlAmbO9B1Sh4Ug1R4A-o9ZzeQ_oocF-Xx_nzWqO3GVsRuK7NpFKldlek9t3FzzP6lbdIAgzX8DHG1A==\"))\ndef serialize_result(cursor, rows):\n    # Получаем названия колонок из курсора",
+        "peekOfCode": "class MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\n# print(crypt.encrypt('MeowMeowMeow')) # Encrypt\n# print(crypt.decrypt(\"gAAAAABnTBxlk2jIAmNvAZGJdocRijS31i_hEFUmCf5jCZ--uF_AAceEjVLqoOuLrE2z2bwk5iCVr-SJYxTstSScK5o8up_efw==\"))\ndef serialize_result(cursor, rows):\n    # Получаем названия колонок из курсора",
         "detail": "back.main",
         "documentation": {}
     },
@@ -78,7 +78,16 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def serialize_result(cursor, rows):\n    # Получаем названия колонок из курсора\n    columns = [desc[0] for desc in cursor.description]\n    # Создаем список словарей, где ключами будут названия колонок\n    return [dict(zip(columns, row)) for row in rows]\n# Получить все записи\n@app.route('/api/getAllTour', methods=['GET'])\ndef get_all_tour():\n    cur = mysql.connection.cursor()\n    cur.execute(\"SELECT * FROM tours\")",
+        "peekOfCode": "def serialize_result(cursor, rows):\n    # Получаем названия колонок из курсора\n    columns = [desc[0] for desc in cursor.description]\n    # Создаем список словарей, где ключами будут названия колонок\n    return [dict(zip(columns, row)) for row in rows]\n# Получить все записи\n@app.route('/api/auth', methods=['POST'])\ndef auth():\n    username = request.json.get('username')\n    password = request.json.get('password')",
+        "detail": "back.main",
+        "documentation": {}
+    },
+    {
+        "label": "auth",
+        "kind": 2,
+        "importPath": "back.main",
+        "description": "back.main",
+        "peekOfCode": "def auth():\n    username = request.json.get('username')\n    password = request.json.get('password')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"SELECT * FROM users WHERE username = '{username}'\")\n    row = cur.fetchone()\n    cur.close()\n    if row is None:\n        return jsonify({\"message\": \"User not found\", \"status\": False}), 404  # Пользователь не найден\n    if crypt.decrypt(row[2]) == password:",
         "detail": "back.main",
         "documentation": {}
     },
@@ -87,7 +96,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def get_all_tour():\n    cur = mysql.connection.cursor()\n    cur.execute(\"SELECT * FROM tours\")\n    rows = cur.fetchall()\n    return jsonify(serialize_result(cur, rows))\n# Получить все записи\n@app.route('/api/getAllTourTeams', methods=['GET'])\ndef get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()",
+        "peekOfCode": "def get_all_tour():\n    cur = mysql.connection.cursor()\n    cur.execute(\"SELECT * FROM tours\")\n    rows = cur.fetchall()\n    return jsonify(serialize_result(cur, rows)), 200\n# Получить все записи\n@app.route('/api/getAllTourTeams', methods=['GET'])\ndef get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()",
         "detail": "back.main",
         "documentation": {}
     },
@@ -96,34 +105,34 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()\n    # Используем параметризированный запрос\n    cur.execute(\"SELECT * FROM tour_teams WHERE tour_id = %s\", (id,))\n    rows = cur.fetchall()\n    return jsonify(serialize_result(cur, rows))\n# Получить все записи\n@app.route('/api/getAllTourTeams', methods=['GET'])\ndef get_all_tour_teams():",
+        "peekOfCode": "def get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()\n    # Используем параметризированный запрос\n    cur.execute(\"SELECT * FROM tour_teams WHERE tour_id = %s\", (id,))\n    rows = cur.fetchall()\n    return jsonify(serialize_result(cur, rows)), 200\n# Получить все записи\n@app.route('/api/saveEditTour', methods=['POST'])\ndef save_edit_tour():",
         "detail": "back.main",
         "documentation": {}
     },
     {
-        "label": "get_all_tour_teams",
+        "label": "save_edit_tour",
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()\n    # Используем параметризированный запрос\n    cur.execute(\"SELECT * FROM tour_teams WHERE tour_id = %s\", (id,))\n    rows = cur.fetchall()\n    return jsonify(serialize_result(cur, rows))\n@app.route('/api/items', methods=['GET'])\ndef get_items():\n    cur = mysql.connection.cursor()",
+        "peekOfCode": "def save_edit_tour():\n    id = request.json.get('id')\n    name = request.json.get('name')\n    date = request.json.get('date')\n    url = request.json.get('url')\n    description = request.json.get('description')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"UPDATE tours SET name='{name}', date='{date}',description='{description}',url='{url}' WHERE id = {id}\")\n    mysql.connection.commit()\n    return get_all_tour()",
         "detail": "back.main",
         "documentation": {}
     },
     {
-        "label": "get_items",
+        "label": "delete_tour",
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def get_items():\n    cur = mysql.connection.cursor()\n    cur.execute(\"SELECT * FROM items\")\n    rows = cur.fetchall()\n    return jsonify(rows)\n# Добавить новую запись\n@app.route('/api/items', methods=['POST'])\ndef add_item():\n    new_item = request.json['name']\n    cur = mysql.connection.cursor()",
+        "peekOfCode": "def delete_tour():\n    id = request.json.get('id')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"DELETE FROM tours WHERE id ='{id}'\")\n    mysql.connection.commit()\n    cur.close()\n    return jsonify({\"status\":True}), 200 \n@app.route('/api/createTour', methods=['POST'])\ndef create_tour():\n    upload_folder = '/storage'",
         "detail": "back.main",
         "documentation": {}
     },
     {
-        "label": "add_item",
+        "label": "create_tour",
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def add_item():\n    new_item = request.json['name']\n    cur = mysql.connection.cursor()\n    cur.execute(\"INSERT INTO items(name) VALUES(%s)\", (new_item,))\n    mysql.connection.commit()\n    return jsonify({'message': 'Item added successfully'}), 201\n# Запуск приложения\nif __name__ == '__main__':\n    app.run(debug=True)",
+        "peekOfCode": "def create_tour():\n    upload_folder = '/storage'\n    data = request.json\n    print(request.files)\n    return jsonify(request.files)\n    if 'image' not in request.files:\n        return 'No file part', 400\n    file = request.files['image']\n    if file.filename == '':\n        return 'No selected file', 400",
         "detail": "back.main",
         "documentation": {}
     },
@@ -132,7 +141,7 @@
         "kind": 5,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "SECRET_KEY = os.getenv(\"SECRET_KEY\")\nassert SECRET_KEY\nprint(SECRET_KEY)\nFERNET = Fernet(SECRET_KEY)\napp = Flask(__name__)\nCORS(app)\n# Конфигурация базы данных\napp.config['MYSQL_HOST'] = os.getenv(\"DB_HOST\")\napp.config['MYSQL_USER'] = os.getenv(\"DB_USERNAME\")\napp.config['MYSQL_PASSWORD'] = os.getenv(\"DB_PASSWORD\")",
+        "peekOfCode": "SECRET_KEY = os.getenv(\"SECRET_KEY\")\nassert SECRET_KEY\nFERNET = Fernet(SECRET_KEY)\napp = Flask(__name__)\nCORS(app)\n# Конфигурация базы данных\napp.config['MYSQL_HOST'] = os.getenv(\"DB_HOST\")\napp.config['MYSQL_USER'] = os.getenv(\"DB_USERNAME\")\napp.config['MYSQL_PASSWORD'] = os.getenv(\"DB_PASSWORD\")\napp.config['MYSQL_DB'] = os.getenv(\"DB_NAME\")",
         "detail": "back.main",
         "documentation": {}
     },
@@ -177,7 +186,7 @@
         "kind": 5,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "app.config['MYSQL_PASSWORD'] = os.getenv(\"DB_PASSWORD\")\napp.config['MYSQL_DB'] = os.getenv(\"DB_NAME\")\nmysql = MySQL(app)\nclass MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\nprint(crypt.encrypt('MeowMeowMeow')) # Encrypt",
+        "peekOfCode": "app.config['MYSQL_PASSWORD'] = os.getenv(\"DB_PASSWORD\")\napp.config['MYSQL_DB'] = os.getenv(\"DB_NAME\")\nmysql = MySQL(app)\nclass MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\n# print(crypt.encrypt('MeowMeowMeow')) # Encrypt",
         "detail": "back.main",
         "documentation": {}
     },
@@ -186,7 +195,7 @@
         "kind": 5,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "app.config['MYSQL_DB'] = os.getenv(\"DB_NAME\")\nmysql = MySQL(app)\nclass MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\nprint(crypt.encrypt('MeowMeowMeow')) # Encrypt\nprint(crypt.decrypt(\"gAAAAABnS_f3cGMHcmH1KlAmbO9B1Sh4Ug1R4A-o9ZzeQ_oocF-Xx_nzWqO3GVsRuK7NpFKldlek9t3FzzP6lbdIAgzX8DHG1A==\"))",
+        "peekOfCode": "app.config['MYSQL_DB'] = os.getenv(\"DB_NAME\")\nmysql = MySQL(app)\nclass MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\n# print(crypt.encrypt('MeowMeowMeow')) # Encrypt\n# print(crypt.decrypt(\"gAAAAABnTBxlk2jIAmNvAZGJdocRijS31i_hEFUmCf5jCZ--uF_AAceEjVLqoOuLrE2z2bwk5iCVr-SJYxTstSScK5o8up_efw==\"))",
         "detail": "back.main",
         "documentation": {}
     },
@@ -195,7 +204,7 @@
         "kind": 5,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "mysql = MySQL(app)\nclass MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\nprint(crypt.encrypt('MeowMeowMeow')) # Encrypt\nprint(crypt.decrypt(\"gAAAAABnS_f3cGMHcmH1KlAmbO9B1Sh4Ug1R4A-o9ZzeQ_oocF-Xx_nzWqO3GVsRuK7NpFKldlek9t3FzzP6lbdIAgzX8DHG1A==\"))\ndef serialize_result(cursor, rows):",
+        "peekOfCode": "mysql = MySQL(app)\nclass MD5:\n   def encrypt(self, data):\n       return FERNET.encrypt(data.encode()).decode()\n   def decrypt(self, data):\n       return FERNET.decrypt(data).decode()\ncrypt = MD5()\n# print(crypt.encrypt('MeowMeowMeow')) # Encrypt\n# print(crypt.decrypt(\"gAAAAABnTBxlk2jIAmNvAZGJdocRijS31i_hEFUmCf5jCZ--uF_AAceEjVLqoOuLrE2z2bwk5iCVr-SJYxTstSScK5o8up_efw==\"))\ndef serialize_result(cursor, rows):",
         "detail": "back.main",
         "documentation": {}
     },
@@ -204,7 +213,7 @@
         "kind": 5,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "crypt = MD5()\nprint(crypt.encrypt('MeowMeowMeow')) # Encrypt\nprint(crypt.decrypt(\"gAAAAABnS_f3cGMHcmH1KlAmbO9B1Sh4Ug1R4A-o9ZzeQ_oocF-Xx_nzWqO3GVsRuK7NpFKldlek9t3FzzP6lbdIAgzX8DHG1A==\"))\ndef serialize_result(cursor, rows):\n    # Получаем названия колонок из курсора\n    columns = [desc[0] for desc in cursor.description]\n    # Создаем список словарей, где ключами будут названия колонок\n    return [dict(zip(columns, row)) for row in rows]\n# Получить все записи\n@app.route('/api/getAllTour', methods=['GET'])",
+        "peekOfCode": "crypt = MD5()\n# print(crypt.encrypt('MeowMeowMeow')) # Encrypt\n# print(crypt.decrypt(\"gAAAAABnTBxlk2jIAmNvAZGJdocRijS31i_hEFUmCf5jCZ--uF_AAceEjVLqoOuLrE2z2bwk5iCVr-SJYxTstSScK5o8up_efw==\"))\ndef serialize_result(cursor, rows):\n    # Получаем названия колонок из курсора\n    columns = [desc[0] for desc in cursor.description]\n    # Создаем список словарей, где ключами будут названия колонок\n    return [dict(zip(columns, row)) for row in rows]\n# Получить все записи\n@app.route('/api/auth', methods=['POST'])",
         "detail": "back.main",
         "documentation": {}
     }
