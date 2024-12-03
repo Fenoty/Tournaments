@@ -84,7 +84,7 @@ def get_all_tour_teams():
     cur = mysql.connection.cursor()
 
     # Используем параметризированный запрос
-    cur.execute("SELECT * FROM tour_teams WHERE tour_id = %s ORDER BY id DESC", (id,))
+    cur.execute("SELECT * FROM tour_teams WHERE tour_id = %s ORDER BY iteration DESC", (id,))
     rows = cur.fetchall()
 
     response = jsonify(serialize_result(cur, rows))
