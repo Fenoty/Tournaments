@@ -4,6 +4,10 @@ from dotenv import load_dotenv
 from flask_cors import CORS 
 from cryptography.fernet import Fernet
 import os
+
+import random
+
+
 load_dotenv()
 
 
@@ -65,9 +69,13 @@ def auth():
 @app.route('/api/getAllTour', methods=['GET'])
 def get_all_tour():
     cur = mysql.connection.cursor()
-    cur.execute("SELECT * FROM tours")
+    cur.execute("SELECT * FROM tours ORDER BY id DESC")
     rows = cur.fetchall()
-    return jsonify(serialize_result(cur, rows)), 200
+
+    response = jsonify(serialize_result(cur, rows))
+    cur.close()
+
+    return response, 200
     
 # Получить все записи
 @app.route('/api/getAllTourTeams', methods=['GET'])
@@ -76,10 +84,13 @@ def get_all_tour_teams():
     cur = mysql.connection.cursor()
 
     # Используем параметризированный запрос
-    cur.execute("SELECT * FROM tour_teams WHERE tour_id = %s", (id,))
+    cur.execute("SELECT * FROM tour_teams WHERE tour_id = %s ORDER BY id DESC", (id,))
     rows = cur.fetchall()
 
-    return jsonify(serialize_result(cur, rows)), 200
+    response = jsonify(serialize_result(cur, rows))
+    cur.close()
+
+    return response, 200
 
 
 
@@ -96,6 +107,8 @@ def save_edit_tour():
     cur.execute(f"UPDATE tours SET name='{name}', date='{date}',description='{description}',url='{url}' WHERE id = {id}")
     mysql.connection.commit()
  
+    cur.close()
+
     return get_all_tour()
  
 # Получить все записи
@@ -113,33 +126,62 @@ def delete_tour():
 
 @app.route('/api/createTour', methods=['POST'])
 def create_tour():
-    upload_folder = '/storage'
-    data = request.json
-    print(request.files)
-    return jsonify(request.files)
+    upload_folder = './storage'
+
+    data = request.form
     if 'image' not in request.files:
         return 'No file part', 400
+
     file = request.files['image']
+    
     if file.filename == '':
         return 'No selected file', 400
 
+        
     filepath = os.path.join(upload_folder, file.filename)
+    filepath_to_db = os.path.join(upload_folder.replace('.', ''), file.filename)
     file.save(filepath)
 
-    name = request.json.get('name')
-    date = request.json.get('date')
-    url = request.json.get('url')
-    description = request.json.get('description')
-    grid_type = request.json.get('grid_type')
-    price_place = request.json.get('price_place')
-    image = filepath
+
+    name = data.get('name')
+    date = data.get('date')
+    url = data.get('url')
+    description = data.get('description')
+    grid_type = data.get('grid_type')
+    price_place = data.get('price_place')
+    image = filepath_to_db
+
+    random_check = data.get('random')
+    teams = data.get('teams')
+ 
 
     cur = mysql.connection.cursor()
     cur.execute(f"INSERT INTO tours (name, date, image, description, url, price_place, grid_type) VALUES ('{name}','{date}','{image}','{description}','{url}',{price_place},'{grid_type}')")
     mysql.connection.commit()
+
+    tour_id = cur.lastrowid
+
+
+    if teams:
+        teams = teams.split(',')
+        if random_check == 'true': 
+            random.shuffle(teams)
+
+    data_to_insert = [(tour_id, team) for team in teams]
+
+    sql = "INSERT INTO tour_teams (tour_id, team) VALUES (%s, %s)"
+    cur.executemany(sql, data_to_insert)
+    mysql.connection.commit()
+
+
+    cur.execute(f"SELECT * FROM tours WHERE id = {tour_id}")
+    rows = cur.fetchall()
+    
+    response = jsonify(serialize_result(cur, rows))
+
     cur.close()
 
-    return 'File uploaded successfully', 200
+    return response, 200
 
 
 # Запуск приложения
