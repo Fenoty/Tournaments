@@ -65,6 +65,15 @@
         "documentation": {}
     },
     {
+        "label": "random",
+        "kind": 6,
+        "isExtraImport": true,
+        "importPath": "random",
+        "description": "random",
+        "detail": "random",
+        "documentation": {}
+    },
+    {
         "label": "MD5",
         "kind": 6,
         "importPath": "back.main",
@@ -96,7 +105,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def get_all_tour():\n    cur = mysql.connection.cursor()\n    cur.execute(\"SELECT * FROM tours\")\n    rows = cur.fetchall()\n    return jsonify(serialize_result(cur, rows)), 200\n# Получить все записи\n@app.route('/api/getAllTourTeams', methods=['GET'])\ndef get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()",
+        "peekOfCode": "def get_all_tour():\n    cur = mysql.connection.cursor()\n    cur.execute(\"SELECT * FROM tours ORDER BY id DESC\")\n    rows = cur.fetchall()\n    response = jsonify(serialize_result(cur, rows))\n    cur.close()\n    return response, 200\n# Получить все записи\n@app.route('/api/getAllTourTeams', methods=['GET'])\ndef get_all_tour_teams():",
         "detail": "back.main",
         "documentation": {}
     },
@@ -105,7 +114,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()\n    # Используем параметризированный запрос\n    cur.execute(\"SELECT * FROM tour_teams WHERE tour_id = %s\", (id,))\n    rows = cur.fetchall()\n    return jsonify(serialize_result(cur, rows)), 200\n# Получить все записи\n@app.route('/api/saveEditTour', methods=['POST'])\ndef save_edit_tour():",
+        "peekOfCode": "def get_all_tour_teams():\n    id = request.args.get('id')\n    cur = mysql.connection.cursor()\n    # Используем параметризированный запрос\n    cur.execute(\"SELECT * FROM tour_teams WHERE tour_id = %s ORDER BY id DESC\", (id,))\n    rows = cur.fetchall()\n    response = jsonify(serialize_result(cur, rows))\n    cur.close()\n    return response, 200\n# Получить все записи",
         "detail": "back.main",
         "documentation": {}
     },
@@ -114,7 +123,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def save_edit_tour():\n    id = request.json.get('id')\n    name = request.json.get('name')\n    date = request.json.get('date')\n    url = request.json.get('url')\n    description = request.json.get('description')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"UPDATE tours SET name='{name}', date='{date}',description='{description}',url='{url}' WHERE id = {id}\")\n    mysql.connection.commit()\n    return get_all_tour()",
+        "peekOfCode": "def save_edit_tour():\n    id = request.json.get('id')\n    name = request.json.get('name')\n    date = request.json.get('date')\n    url = request.json.get('url')\n    description = request.json.get('description')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"UPDATE tours SET name='{name}', date='{date}',description='{description}',url='{url}' WHERE id = {id}\")\n    mysql.connection.commit()\n    cur.close()",
         "detail": "back.main",
         "documentation": {}
     },
@@ -123,7 +132,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def delete_tour():\n    id = request.json.get('id')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"DELETE FROM tours WHERE id ='{id}'\")\n    mysql.connection.commit()\n    cur.close()\n    return jsonify({\"status\":True}), 200 \n@app.route('/api/createTour', methods=['POST'])\ndef create_tour():\n    upload_folder = '/storage'",
+        "peekOfCode": "def delete_tour():\n    id = request.json.get('id')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"DELETE FROM tours WHERE id ='{id}'\")\n    mysql.connection.commit()\n    cur.close()\n    return jsonify({\"status\":True}), 200 \n@app.route('/api/createTour', methods=['POST'])\ndef create_tour():\n    upload_folder = './storage'",
         "detail": "back.main",
         "documentation": {}
     },
@@ -132,7 +141,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def create_tour():\n    upload_folder = '/storage'\n    data = request.json\n    print(request.files)\n    return jsonify(request.files)\n    if 'image' not in request.files:\n        return 'No file part', 400\n    file = request.files['image']\n    if file.filename == '':\n        return 'No selected file', 400",
+        "peekOfCode": "def create_tour():\n    upload_folder = './storage'\n    data = request.form\n    if 'image' not in request.files:\n        return 'No file part', 400\n    file = request.files['image']\n    if file.filename == '':\n        return 'No selected file', 400\n    filepath = os.path.join(upload_folder, file.filename)\n    filepath_to_db = os.path.join(upload_folder.replace('.', ''), file.filename)",
         "detail": "back.main",
         "documentation": {}
     },
