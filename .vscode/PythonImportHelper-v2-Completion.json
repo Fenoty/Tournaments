@@ -159,7 +159,7 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def set_winner_round():\n    iteration = int(request.json.get('iter')) + 1\n    tour_id = request.json.get('tourId')\n    winner = request.json.get('winner')\n    looser = request.json.get('looser')\n    winner_team_id = winner[\"team_id\"]\n    winner_team_name = winner[\"name\"]\n    looser_team_id = looser[\"team_id\"]\n    print(looser)\n    cur = mysql.connection.cursor() ",
+        "peekOfCode": "def set_winner_round():\n    iteration = int(request.json.get('iter')) + 1\n    tour_id = request.json.get('tourId')\n    winner = request.json.get('winner')\n    looser = request.json.get('looser')\n    type_bracket = True if request.json.get('type') else False\n    print(request.json.get('type'))\n    print(type_bracket)\n    grid_type = request.json.get('gridType')\n    winner_team_id = winner[\"team_id\"]",
         "detail": "back.main",
         "documentation": {}
     },
