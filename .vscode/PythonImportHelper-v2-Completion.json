@@ -150,7 +150,16 @@
         "kind": 2,
         "importPath": "back.main",
         "description": "back.main",
-        "peekOfCode": "def edit_team_score():\n    team_id = request.json.get('teamId')\n    score = request.json.get('score')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"UPDATE tour_teams SET points={score} WHERE id = {team_id}\")\n    mysql.connection.commit()\n    cur.close()\n    return jsonify({\"status\":True}), 200 \n# Запуск приложения\nif __name__ == '__main__':",
+        "peekOfCode": "def edit_team_score():\n    team_id = request.json.get('teamId')\n    score = request.json.get('score')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"UPDATE tour_teams SET points={score} WHERE id = {team_id}\")\n    mysql.connection.commit()\n    cur.close()\n    return jsonify({\"status\":True}), 200 \n@app.route('/api/setWinnerRound', methods=['POST'])\ndef set_winner_round():",
+        "detail": "back.main",
+        "documentation": {}
+    },
+    {
+        "label": "set_winner_round",
+        "kind": 2,
+        "importPath": "back.main",
+        "description": "back.main",
+        "peekOfCode": "def set_winner_round():\n    iteration = int(request.json.get('iter')) + 1\n    tour_id = request.json.get('tourId')\n    winner = request.json.get('winner')\n    looser = request.json.get('looser')\n    winner_team_id = winner[\"team_id\"]\n    winner_team_name = winner[\"name\"]\n    looser_team_id = looser[\"team_id\"]\n    print(looser)\n    cur = mysql.connection.cursor() ",
         "detail": "back.main",
         "documentation": {}
     },
