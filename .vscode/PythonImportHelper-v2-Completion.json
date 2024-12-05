@@ -146,6 +146,15 @@
         "documentation": {}
     },
     {
+        "label": "edit_team_score",
+        "kind": 2,
+        "importPath": "back.main",
+        "description": "back.main",
+        "peekOfCode": "def edit_team_score():\n    team_id = request.json.get('teamId')\n    score = request.json.get('score')\n    cur = mysql.connection.cursor()\n    cur.execute(f\"UPDATE tour_teams SET points={score} WHERE id = {team_id}\")\n    mysql.connection.commit()\n    cur.close()\n    return jsonify({\"status\":True}), 200 \n# Запуск приложения\nif __name__ == '__main__':",
+        "detail": "back.main",
+        "documentation": {}
+    },
+    {
         "label": "SECRET_KEY",
         "kind": 5,
         "importPath": "back.main",
