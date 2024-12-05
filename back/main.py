@@ -37,9 +37,7 @@ class MD5:
        return FERNET.decrypt(data).decode()
 
 crypt = MD5()
-# print(crypt.encrypt('MeowMeowMeow')) # Encrypt
-# print(crypt.decrypt("gAAAAABnTBxlk2jIAmNvAZGJdocRijS31i_hEFUmCf5jCZ--uF_AAceEjVLqoOuLrE2z2bwk5iCVr-SJYxTstSScK5o8up_efw=="))
- 
+
 
 def serialize_result(cursor, rows):
     # Получаем названия колонок из курсора
@@ -206,8 +204,7 @@ def set_winner_round():
     winner = request.json.get('winner')
     looser = request.json.get('looser')
     type_bracket = True if request.json.get('type') else False
-    print(request.json.get('type'))
-    print(type_bracket)
+
     grid_type = request.json.get('gridType')
 
 
@@ -236,10 +233,8 @@ def set_winner_round():
 
     # Условие на тип сетки, для выставления победителя
     if type_bracket:
-        print(f"type_bracket: {type_bracket}")
         cur.execute(f"INSERT INTO tour_teams (tour_id, iteration, team) VALUES ({tour_id}, {iteration}, '{winner_team_name}')")
     else:
-        print(f"type_bracket: {type_bracket}")
         cur.execute(f"INSERT INTO tour_teams (tour_id, iteration, team, lower) VALUES ({tour_id}, {iteration}, '{winner_team_name}', 1)")
     
     mysql.connection.commit()
