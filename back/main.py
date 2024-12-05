@@ -198,6 +198,41 @@ def edit_team_score():
 
     return jsonify({"status":True}), 200 
 
+
+@app.route('/api/setWinnerRound', methods=['POST'])
+def set_winner_round():
+    iteration = int(request.json.get('iter')) + 1
+    tour_id = request.json.get('tourId')
+    winner = request.json.get('winner')
+    looser = request.json.get('looser')
+
+    winner_team_id = winner["team_id"]
+    winner_team_name = winner["name"]
+
+    looser_team_id = looser["team_id"]
+
+    print(looser)
+    cur = mysql.connection.cursor() 
+    cur.execute(f"UPDATE tour_teams SET win = 1 WHERE id = {winner_team_id}")
+
+    if looser["id"]: 
+        cur.execute(f"UPDATE tour_teams SET win = 2 WHERE id = {looser_team_id}")
+
+
+    cur.execute(f"INSERT INTO tour_teams (tour_id, iteration, team) VALUES ({tour_id}, {iteration}, '{winner_team_name}')")
+    mysql.connection.commit()
+
+    tour_last_row_id = cur.lastrowid
+
+    cur.execute(f"SELECT * FROM tour_teams WHERE id = {tour_last_row_id}")
+    rows = cur.fetchall()
+    
+    response = jsonify(serialize_result(cur, rows))
+    cur.close()    
+    
+
+    return response, 200 
+
  
 
 
