@@ -55,6 +55,7 @@
                                 <!-- <Grid :grid="teamsData" :logged="isLoggedIn"/> -->
                                 <TourRowBracket
                                     :games="teamsGridData"
+                                    @setWinners="setWinnerRound"
                                 />
 
                             </div>
@@ -97,6 +98,11 @@ const tabs = ref({
 })
 
 
+const setWinnerRound = async (data: any) => {
+    await adminStorage.setWinnerRound(route.params.id, data.winner, data.looser, data.iteration)
+}
+
+
 
 const initData = async (route: any) => {
     if (route.params.id) {
@@ -104,7 +110,6 @@ const initData = async (route: any) => {
         await tourStorage.getAllTourTeams(Number(route.params.id))
     }  
 }
-
 
 onMounted(async () => {
     await initData(route);
