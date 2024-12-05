@@ -152,7 +152,6 @@ export const adminStore = defineStore('AdminStore', {
                     'Произошла ошибка',
                 )
                 .then(async (response) => {      
-                    console.log(response);
                     const tourStorage = tourStore() 
                 
                     await response.map((item: any) => {
@@ -190,10 +189,43 @@ export const adminStore = defineStore('AdminStore', {
 
                 await tourStorage.teams.current.map((item: any) => {
                     if (item.id === teamId) {
-                        
                         item.points = score
                     }
                 })     
+            })
+            .catch((error) => console.log(error));
+        },
+        async setWinnerRound(tourId: any, winner: any, looser: any, iter: any) {
+            const promise = axios({
+                method: "post",
+                url: `${import.meta.env.VITE_API_URL}/setWinnerRound`,
+                data: {
+                    iter,
+                    tourId, 
+                    winner,
+                    looser
+                }
+            })
+
+            return await promiseAlert(promise,
+                'Определяем победитея...',
+                'Победитель определен',
+                'Произошла ошибка',
+            )
+            .then(async (response) => { 
+                console.log(response);
+                const tourStorage = tourStore()     
+                
+                await tourStorage.teams.current.map((item: any) => {
+                    if (Number(item.id) === Number(looser.team_id)) {
+                        item.win = 2
+                    }
+                    else if (Number(item.id) === Number(winner.team_id)) {
+                        item.win = 1
+                    }
+                })     
+
+                tourStorage.teams.current.push(response[0])
             })
             .catch((error) => console.log(error));
         },
