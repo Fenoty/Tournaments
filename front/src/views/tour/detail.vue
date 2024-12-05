@@ -43,21 +43,31 @@
                         <template v-if="tabs.teams">
                             <div class="tournament-content-teams">
                                 <ul>
-                                    <li v-for="item in teamsData" :key="item.id">
-                                        <h6>{{ item.team }}</h6>
-                                        <p>Очков: {{ item.points }}</p>
-                                    </li>
+                                    <template v-for="item in teamsData" :key="item.id">
+                                        <li :class="item.place">
+                                            <h6>{{ item.team }}</h6>
+                                            <p>Очков: {{ item.points }}</p>
+                                        </li>
+                                    </template>
                                 </ul>
                             </div>
                         </template>
                         <template v-else-if="tabs.grid">
                             <div class="tournament-content-grid">
-                                <!-- <Grid :grid="teamsData" :logged="isLoggedIn"/> -->
                                 <TourRowBracket
-                                    :games="teamsGridData"
+                                    :games="teamsGridData.normal"
+                                    :gridType="tourData.grid_type"
+                                    :logged="isLoggedIn"
                                     @setWinners="setWinnerRound"
                                 />
-
+                                <template v-if="tourData.grid_type === 'lower' && teamsGridData.lower">
+                                    <TourRowBracket
+                                        :games="teamsGridData.lower"
+                                        :normal="false"
+                                        :logged="isLoggedIn"
+                                        @setWinners="setWinnerRound"
+                                    />
+                                </template>
                             </div>
                         </template>
                     </div>
@@ -99,9 +109,8 @@ const tabs = ref({
 
 
 const setWinnerRound = async (data: any) => {
-    await adminStorage.setWinnerRound(route.params.id, data.winner, data.looser, data.iteration)
+    await adminStorage.setWinnerRound(route.params.id, data.winner, data.looser, data.iteration, data.type, data.gridType)
 }
-
 
 
 const initData = async (route: any) => {
@@ -234,10 +243,23 @@ onMounted(async () => {
                         font-size: 16px;
                         font-weight: 500;
                     }
+                    &.gold{
+                        background: #FFD700;
+                    }
+                    &.silver{
+                        background: #C0C0C0;
+                    }
+                    &.bronze{
+                        background: #CD7F32;
+                    }
                 }
             }
         }
-       
+        &-grid{
+            display: flex;
+            flex-direction: row;
+            gap: 40px;
+        }
     }
 }
 </style>
