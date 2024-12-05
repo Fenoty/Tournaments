@@ -167,5 +167,35 @@ export const adminStore = defineStore('AdminStore', {
                 
             }
         },
+
+
+        // BRACKETS
+        async editTeamScore(teamId: number, score: number) {
+            const promise = axios({
+                method: "post",
+                url: `${import.meta.env.VITE_API_URL}/editTeamScore`,
+                data: {
+                    teamId,
+                    score
+                }
+            })
+
+            return await promiseAlert(promise,
+                'Меняем очки...',
+                'Очки изменены',
+                'Произошла ошибка',
+            )
+            .then(async (response) => {      
+                const tourStorage = tourStore()
+
+                await tourStorage.teams.current.map((item: any) => {
+                    if (item.id === teamId) {
+                        
+                        item.points = score
+                    }
+                })     
+            })
+            .catch((error) => console.log(error));
+        },
     },
 });

@@ -52,7 +52,11 @@
                         </template>
                         <template v-else-if="tabs.grid">
                             <div class="tournament-content-grid">
-                                <Grid :grid="teamsGridData" :logged="isLoggedIn"/>
+                                <!-- <Grid :grid="teamsData" :logged="isLoggedIn"/> -->
+                                <TourRowBracket
+                                    :games="teamsGridData"
+                                />
+
                             </div>
                         </template>
                     </div>
@@ -72,6 +76,7 @@ import { tourStore } from '@stores/tours'
 import { computed, onMounted, ref, watch } from 'vue';
 
 import Grid from "@/components/layout/Grid.vue";
+import TourRowBracket from "@/components/bracket/TourRowBracket.vue";
 import _ from "lodash";
 import { adminStore } from "@/stores/admin";
 
@@ -84,8 +89,8 @@ const tourStorage = tourStore();
 const isLoggedIn = computed(() => adminStorage.isLoggedIn)
 
 const tourData = ref({}) as any;
-const teamsData = ref({}) as any;
-const teamsGridData = ref([]) as any;
+const teamsData = computed(() => tourStorage.getOnlyTeams);
+const teamsGridData = computed(() => tourStorage.getGeneratedBracket);
 
 const tabs = ref({
     teams: false as boolean,
@@ -97,62 +102,10 @@ const tabs = ref({
 const initData = async (route: any) => {
     if (route.params.id) {
         tourData.value = await tourStorage.getCurrentTour(Number(route.params.id))
-
-        const teamsRawData = await tourStorage.getAllTourTeams(Number(route.params.id))
-        teamsData.value = _.filter(teamsRawData, {iteration: 0})
-        teamsGridData.value = generateGrid(teamsRawData)
+        await tourStorage.getAllTourTeams(Number(route.params.id))
     }  
 }
 
-
-const generateGrid = (data: any) => {
-    const rounds = [] as any
-
-    for (let iteration = 0; iteration <= data[0].iteration; iteration++) {
-
-        let allPlayers = _.chunk(_.filter(data, {iteration: iteration}), 2)
-        console.log('allPlayers',allPlayers);
-        
-        let games = [] as any
-        allPlayers.forEach((chunk: any) => {
-            console.log('chunk', chunk);
-            
-            let game = {}
-            if (chunk.length == 2) {
-                game = {
-                    player1: {
-                        id: chunk[0].team.toString(),
-                        team_id: chunk[0].id.toString(),
-                        name: chunk[0].team,
-                        winner: chunk[0].win
-                    },
-                    player2: {
-                        id: chunk[1].team.toString(),
-                        team_id: chunk[1].id.toString(), // Пример, взять следующего игрока
-                        name: chunk[1].team,
-                        winner: chunk[1].win // Условие по вашему требованию
-                    }
-                };
-            }
-            else{
-                game = {
-                    player1: {
-                        id: chunk[0].team.toString(),
-                        team_id: chunk[0].id.toString(),
-                        name: chunk[0].team,
-                        winner: chunk[0].win
-                    },
-                };
-            }
-            games.push(game)
-        });
-        console.log('games', games);
-        rounds.push({games: games})
-        console.log('rounds', rounds);
-    }
-
-    return rounds
-}
 
 onMounted(async () => {
     await initData(route);
@@ -280,10 +233,7 @@ onMounted(async () => {
                 }
             }
         }
-        &-grid{
-            max-height: 700px;
-            overflow: scroll;
-        }
+       
     }
 }
 </style>
