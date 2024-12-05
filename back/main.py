@@ -205,30 +205,58 @@ def set_winner_round():
     tour_id = request.json.get('tourId')
     winner = request.json.get('winner')
     looser = request.json.get('looser')
+    type_bracket = True if request.json.get('type') else False
+    print(request.json.get('type'))
+    print(type_bracket)
+    grid_type = request.json.get('gridType')
+
+
 
     winner_team_id = winner["team_id"]
     winner_team_name = winner["name"]
 
     looser_team_id = looser["team_id"]
+    looser_team_name = looser["name"]
 
-    print(looser)
+
     cur = mysql.connection.cursor() 
     cur.execute(f"UPDATE tour_teams SET win = 1 WHERE id = {winner_team_id}")
 
+    looser_response = None
     if looser["id"]: 
         cur.execute(f"UPDATE tour_teams SET win = 2 WHERE id = {looser_team_id}")
+        if grid_type == 'lower':
+            cur.execute(f"INSERT INTO tour_teams (tour_id, team, lower) VALUES ({tour_id}, '{looser_team_name}', 1)")
+            mysql.connection.commit()
+            looser_lower_row_id = cur.lastrowid
 
+            cur.execute(f"SELECT * FROM tour_teams WHERE id = {looser_lower_row_id}")
+            looser_rows = cur.fetchall()
+            looser_response = serialize_result(cur, looser_rows)
 
-    cur.execute(f"INSERT INTO tour_teams (tour_id, iteration, team) VALUES ({tour_id}, {iteration}, '{winner_team_name}')")
+    # Условие на тип сетки, для выставления победителя
+    if type_bracket:
+        print(f"type_bracket: {type_bracket}")
+        cur.execute(f"INSERT INTO tour_teams (tour_id, iteration, team) VALUES ({tour_id}, {iteration}, '{winner_team_name}')")
+    else:
+        print(f"type_bracket: {type_bracket}")
+        cur.execute(f"INSERT INTO tour_teams (tour_id, iteration, team, lower) VALUES ({tour_id}, {iteration}, '{winner_team_name}', 1)")
+    
     mysql.connection.commit()
-
     tour_last_row_id = cur.lastrowid
 
     cur.execute(f"SELECT * FROM tour_teams WHERE id = {tour_last_row_id}")
     rows = cur.fetchall()
     
-    response = jsonify(serialize_result(cur, rows))
-    cur.close()    
+    default = serialize_result(cur, rows)
+
+    response = {
+        'lower': looser_response,
+        'normal': default
+    }
+
+    response = jsonify(response)
+    cur.close()
     
 
     return response, 200 
