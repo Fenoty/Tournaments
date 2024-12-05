@@ -167,11 +167,11 @@ def create_tour():
         if random_check == 'true': 
             random.shuffle(teams)
 
-    data_to_insert = [(tour_id, team) for team in teams]
-
-    sql = "INSERT INTO tour_teams (tour_id, team) VALUES (%s, %s)"
-    cur.executemany(sql, data_to_insert)
-    mysql.connection.commit()
+        data_to_insert = [(tour_id, team) for team in teams]
+        sql = "INSERT INTO tour_teams (tour_id, team) VALUES (%s, %s)"
+        cur.executemany(sql, data_to_insert)
+        mysql.connection.commit()
+    
 
 
     cur.execute(f"SELECT * FROM tours WHERE id = {tour_id}")
@@ -182,6 +182,24 @@ def create_tour():
     cur.close()
 
     return response, 200
+
+
+
+# Получить все записи
+@app.route('/api/editTeamScore', methods=['POST'])
+def edit_team_score():
+    team_id = request.json.get('teamId')
+    score = request.json.get('score')
+
+    cur = mysql.connection.cursor()
+    cur.execute(f"UPDATE tour_teams SET points={score} WHERE id = {team_id}")
+    mysql.connection.commit()
+    cur.close()
+
+    return jsonify({"status":True}), 200 
+
+ 
+
 
 
 # Запуск приложения
