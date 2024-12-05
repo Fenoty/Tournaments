@@ -75,7 +75,6 @@ import { tourStore } from '@stores/tours'
 
 import { computed, onMounted, ref, watch } from 'vue';
 
-import Grid from "@/components/layout/Grid.vue";
 import TourRowBracket from "@/components/bracket/TourRowBracket.vue";
 import _ from "lodash";
 import { adminStore } from "@/stores/admin";
