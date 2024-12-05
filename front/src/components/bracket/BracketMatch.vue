@@ -1,17 +1,14 @@
 <template>
     <div class="team" :class="{'winner': player.winner === 1, 'looser': player.winner === 2}">
-        <div @click.stop="edit = true" class="score" :class="{'edit': edit}">
-            <span>{{ player.score }}</span>
-            <div class="edit">
-                <input v-model="player.score" min="0" type="number">
+        <div @click.stop="logged ? edit = true : ''" class="score" :class="{'edit': edit}">
+            <span>{{ score }}</span>
+            <div v-if="logged" class="edit">
+                <input v-model="score" min="0" type="number">
                 <div class="edit-buttons">
                     <button @click.stop="editTeamScore(player.team_id)" class="success"></button>
                     <button @click.stop="edit = false" class="close"></button>
                 </div>
             </div>
-        </div>
-        <div class="winner">
-            
         </div>
         <div class="name">
             <h6>Команда:</h6>
@@ -30,13 +27,18 @@ const props = defineProps({
     player: {
         type: Object,
         required: true
-    }
+    },
+    logged: {
+        type: Boolean,
+        required: true
+    },
 })
 
+const score = ref(props.player.score)
 const edit = ref(false)
 
 const editTeamScore = async (teamId: number) => {
-    await adminStorage.editTeamScore(Number(teamId), props.player.score)
+    await adminStorage.editTeamScore(Number(teamId), score.value)
     edit.value = false
 }
 
